@@ -1,0 +1,22 @@
+[
+    {
+        "period": "2024 - Present",
+        "title": "Junior IT Trainer",
+        "company": "SaiPali Institute of Technology and Management, Entebbe",
+        "bullets": [
+            "Training diploma students in web development & software engineering.",
+            "Guiding hands-on projects in HTML, CSS, JS, and PHP.",
+            "Developing curriculum and digital learning resources."
+        ]
+    },
+    {
+        "period": "2013 - Present",
+        "title": "Freelance Graphic Designer & Web Developer",
+        "company": "Self-Employed",
+        "bullets": [
+            "Designing marketing collateral (logos, brochures, posters).",
+            "Building responsive, high-performance websites.",
+            "Providing web security, maintenance, and consultation."
+        ]
+    }
+]

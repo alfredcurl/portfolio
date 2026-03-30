@@ -1,0 +1,18 @@
+[
+    {
+        "initial": "C",
+        "name": "Curl.Inc Media",
+        "role": "Founder & Lead Creative",
+        "role_color": "text-green-500",
+        "description": "A digital media brand focused on high-quality content creation and storytelling. We manage the intersection of technology and art to deliver compelling visual narratives.",
+        "bg_color": "bg-purple-500\/10"
+    },
+    {
+        "initial": "D",
+        "name": "Digital Insanity",
+        "role": "Principal Innovator",
+        "role_color": "text-gold-500",
+        "description": "A forward-thinking tech initiative exploring unconventional digital solutions. Focusing on experimental web design and pushing the boundaries of standard user interfaces.",
+        "bg_color": "bg-green-500\/10"
+    }
+]

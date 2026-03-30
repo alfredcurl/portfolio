@@ -1,0 +1,14 @@
+{
+    "site_title": "Alfred Kaliisa | Full-Stack Developer & Digital Creative",
+    "meta_description": "Alfred Kaliisa - Full-Stack Developer and Digital Creative based in Kampala, Uganda.",
+    "primary_color": "#66BB6A",
+    "accent_color": "#FFA000",
+    "nav_links": [
+        "About",
+        "Skills",
+        "Experience",
+        "Portfolio",
+        "Ventures",
+        "Contact"
+    ]
+}

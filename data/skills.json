@@ -1,0 +1,62 @@
+{
+    "coding": [
+        {
+            "name": "HTML5",
+            "percent": 100
+        },
+        {
+            "name": "JavaScript (ES6+)",
+            "percent": 93
+        },
+        {
+            "name": "WordPress & CMS",
+            "percent": 90
+        },
+        {
+            "name": "CSS3 \/ Tailwind",
+            "percent": 90
+        },
+        {
+            "name": "PHP",
+            "percent": 82
+        }
+    ],
+    "tools": [
+        {
+            "name": "React.js",
+            "icon": "fab fa-react",
+            "color": "text-blue-400",
+            "desc": "Frontend Library"
+        },
+        {
+            "name": "Node.js",
+            "icon": "fab fa-node",
+            "color": "text-green-500",
+            "desc": "Backend Runtime"
+        },
+        {
+            "name": "Adobe Suite",
+            "icon": "fab fa-adobe",
+            "color": "text-red-500",
+            "desc": "Ps, Ai, Id, Pr"
+        },
+        {
+            "name": "Photography",
+            "icon": "fas fa-camera",
+            "color": "text-slate-200",
+            "desc": "Visual Storytelling"
+        },
+        {
+            "name": "Git\/GitHub",
+            "icon": "fab fa-git-alt",
+            "color": "text-orange-500",
+            "desc": "Version Control"
+        },
+        {
+            "name": "MySQL",
+            "icon": "fas fa-database",
+            "color": "text-blue-300",
+            "desc": "Database Mgmt"
+        }
+    ]
+}

@@ -1,0 +1,22 @@
+Options -Indexes
+
+RewriteEngine On
+RewriteBase /
+
+# Allow direct access to existing files and directories
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route API calls
+RewriteRule ^api/(.*)$ api/$1 [L]
+
+# Route admin
+RewriteRule ^admin/? admin/index.php [L]
+
+# Route public site
+RewriteRule ^$ public/index.php [L]
+RewriteRule ^public/? public/index.php [L]
+
+# Security: protect data directory
+RewriteRule ^data/ - [F,L]
+RewriteRule ^includes/ - [F,L]

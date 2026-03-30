@@ -1,0 +1,88 @@
+[
+    {
+        "title": "Corporate Website",
+        "category": "Web Development",
+        "cat_color": "green",
+        "description": "Responsive corporate website with modern design and CMS integration.",
+        "icon": "fas fa-globe",
+        "icon_color": "text-green-500",
+        "bg_gradient": "from-green-500\/20 to-gold-500\/20",
+        "tags": [
+            "WordPress",
+            "PHP",
+            "CSS"
+        ],
+        "link": "#"
+    },
+    {
+        "title": "Brand Identity Design",
+        "category": "Branding",
+        "cat_color": "gold",
+        "description": "Complete brand identity package including logo, colors, and marketing materials.",
+        "icon": "fas fa-palette",
+        "icon_color": "text-gold-500",
+        "bg_gradient": "from-gold-500\/20 to-green-500\/20",
+        "tags": [
+            "Illustrator",
+            "Photoshop"
+        ],
+        "link": "#"
+    },
+    {
+        "title": "Online Store",
+        "category": "E-Commerce",
+        "cat_color": "blue",
+        "description": "Full-featured e-commerce platform with payment integration and inventory management.",
+        "icon": "fas fa-shopping-cart",
+        "icon_color": "text-blue-400",
+        "bg_gradient": "from-blue-500\/20 to-purple-500\/20",
+        "tags": [
+            "WooCommerce",
+            "JavaScript"
+        ],
+        "link": "#"
+    },
+    {
+        "title": "Mobile App Interface",
+        "category": "UI\/UX Design",
+        "cat_color": "purple",
+        "description": "User-friendly mobile application interface with intuitive navigation and modern aesthetics.",
+        "icon": "fas fa-mobile-alt",
+        "icon_color": "text-purple-400",
+        "bg_gradient": "from-purple-500\/20 to-pink-500\/20",
+        "tags": [
+            "Figma",
+            "React"
+        ],
+        "link": "#"
+    },
+    {
+        "title": "Photography Portfolio",
+        "category": "Photography",
+        "cat_color": "red",
+        "description": "Professional photography portfolio website with gallery and client booking system.",
+        "icon": "fas fa-camera",
+        "icon_color": "text-red-400",
+        "bg_gradient": "from-red-500\/20 to-orange-500\/20",
+        "tags": [
+            "HTML5",
+            "Lightroom"
+        ],
+        "link": "#"
+    },
+    {
+        "title": "Business Dashboard",
+        "category": "Web App",
+        "cat_color": "cyan",
+        "description": "Analytics dashboard for business management with real-time data visualization.",
+        "icon": "fas fa-code-branch",
+        "icon_color": "text-cyan-400",
+        "bg_gradient": "from-cyan-500\/20 to-teal-500\/20",
+        "tags": [
+            "React",
+            "Node.js",
+            "MySQL"
+        ],
+        "link": "#"
+    }
+]

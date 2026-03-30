@@ -1,0 +1,22 @@
+{
+    "bio1": "I am a passionate <span class=\"text-green-500 font-semibold\">Full-Stack Developer<\/span> and <span class=\"text-gold-500 font-semibold\">Digital Creative<\/span> with over 8 years of experience delivering innovative digital solutions. Currently based in Kampala, Uganda, I sit at the unique intersection of technical engineering and artistic creation.",
+    "bio2": "Specializing in both front-end and back-end development, I combine technical proficiency with a creative mindset to craft user-centered, visually engaging, and high-performing web solutions. Whether I'm teaching the next generation of devs at SaiPali Institute or building brands through Curl.Inc Media, my goal remains the same: <span class=\"text-white italic\">to innovate and inspire.<\/span>",
+    "stats": [
+        {
+            "value": "8+",
+            "label": "Years Exp."
+        },
+        {
+            "value": "50+",
+            "label": "Projects"
+        },
+        {
+            "value": "2",
+            "label": "Ventures"
+        },
+        {
+            "value": "100%",
+            "label": "Satisfaction"
+        }
+    ]
+}
