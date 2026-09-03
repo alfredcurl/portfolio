@@ -50,7 +50,10 @@ class Auth
     public static function requireLogin(): void
     {
         if (!self::isLoggedIn()) {
-            header('Location: /admin');
+            $script_path = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '/admin/index.php');
+            $project_base = dirname(dirname($script_path));
+            $project_base = $project_base === '/' || $project_base === '.' ? '' : rtrim($project_base, '/');
+            header('Location: ' . $project_base . '/admin/index.php');
             exit;
         }
     }

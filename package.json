@@ -1,0 +1,14 @@
+{
+  "name": "portfolio-optimization",
+  "version": "1.0.0",
+  "description": "Portfolio site with performance optimizations",
+  "scripts": {
+    "build:css": "tailwindcss build -i ./assets/css/input.css -o ./assets/css/tailwind.min.css --minify",
+    "watch:css": "tailwindcss -i ./assets/css/input.css -o ./assets/css/tailwind.min.css --watch",
+    "start": "php -S localhost:8000",
+    "optimize": "node optimize-images.js"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.0.0"
+  }
+}

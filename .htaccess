@@ -1,7 +1,11 @@
 Options -Indexes
+DirectoryIndex index.php
 
 RewriteEngine On
 RewriteBase /
+
+# Keep older cached favicon URLs working after media was moved to uploads.
+RewriteRule ^logo\.png$ uploads/logowiz_02032026_173518_69b05669498e3.jpg [L]
 
 # Allow robots.txt and sitemap.xml to be served directly or via PHP
 RewriteRule ^robots\.txt$ robots.txt [L]

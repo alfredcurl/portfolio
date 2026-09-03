@@ -6,9 +6,11 @@
 // =============================================
 
 require_once ROOT_PATH . '/includes/config.php';
+require_once ROOT_PATH . '/includes/cache.php';
 
 class DataStore
 {
+    private static $cache_ttl = 3600; // Cache for 1 hour
 
     // ── Ensure uploads directory exists ──────────────────
     public static function initUploads(): void
@@ -19,8 +21,27 @@ class DataStore
         }
     }
 
-    // ── Get a section's data from MySQL ──────────────────
+    // ── Get a section's data from MySQL with caching ─────
     public static function get(string $section, bool $include_deleted = false): array
+    {
+        // Try cache first
+        $cache_key = "section_{$section}_deleted_" . ($include_deleted ? '1' : '0');
+        $cached = Cache::get($cache_key);
+        if ($cached !== null) {
+            return $cached;
+        }
+        
+        // If not in cache, fetch from database
+        $result = self::fetchFromDatabase($section, $include_deleted);
+        
+        // Store in cache
+        Cache::set($cache_key, $result, self::$cache_ttl);
+        
+        return $result;
+    }
+
+    // ── Fetch data from MySQL ────────────────────────────
+    private static function fetchFromDatabase(string $section, bool $include_deleted = false): array
     {
         $crud_map = [
             'portfolio'  => 'portfolio_projects',
@@ -96,11 +117,27 @@ class DataStore
             } else {
                 DB::query("INSERT INTO cms_sections (section_name, content, created_at, updated_at) VALUES (?, ?, NOW(), NOW())", [$section, $json]);
             }
+            
+            // Clear cache after saving
+            Cache::delete("section_{$section}_deleted_0");
+            Cache::delete("section_{$section}_deleted_1");
+            
             return true;
         } catch (\Exception $e) {
             error_log("DataStore::save error: " . $e->getMessage());
             return false;
         }
+    }
+
+    // ── Clear all cache ───────────────────────────────────
+    public static function clearCache(?string $section = null): bool
+    {
+        if ($section) {
+            Cache::delete("section_{$section}_deleted_0");
+            Cache::delete("section_{$section}_deleted_1");
+            return true;
+        }
+        return Cache::flush();
     }
 
     // ── CRUD Item Operations ─────────────────────────────
@@ -157,11 +194,13 @@ class DataStore
             if ($id > 0) {
                 $params[] = $id;
                 DB::query("UPDATE $table SET " . implode(', ', $setPart) . ", updated_at = NOW(), deleted_at = NULL WHERE id = ?", $params);
-                return $id;
+                $saved_id = $id;
             } else {
                 DB::query("INSERT INTO $table SET " . implode(', ', $setPart) . ", created_at = NOW(), updated_at = NOW()", $params);
-                return (int)DB::connect()->lastInsertId();
+                $saved_id = (int)DB::connect()->lastInsertId();
             }
+            self::clearCache($section);
+            return $saved_id;
         } catch (\Exception $e) {
             error_log("DataStore::saveItem error: " . $e->getMessage());
             return null;
@@ -181,6 +220,7 @@ class DataStore
         $table = $tableMap[$section];
         try {
             DB::query("UPDATE $table SET deleted_at = NOW() WHERE id = ?", [$id]);
+            self::clearCache($section);
             return true;
         } catch (\Exception $e) {
             return false;
@@ -200,6 +240,7 @@ class DataStore
         $table = $tableMap[$section];
         try {
             DB::query("UPDATE $table SET deleted_at = NULL WHERE id = ?", [$id]);
+            self::clearCache($section);
             return true;
         } catch (\Exception $e) {
             return false;
@@ -231,25 +272,30 @@ class DataStore
         foreach ($crud_map as $section => $table) {
             try {
                 $count = DB::row("SELECT COUNT(*) as c FROM $table")['c'] ?? 0;
-                if ($count == 0) {
+                if ($section === 'skills') {
                     $defaults = self::getDefaults($section);
-                    // Skills is special since it has tools/coding keys
-                    if ($section === 'skills') {
+                    // Backfill either skills group independently for older databases.
+                    $coding_count = DB::row("SELECT COUNT(*) as c FROM $table WHERE type = 'coding'")['c'] ?? 0;
+                    $tools_count = DB::row("SELECT COUNT(*) as c FROM $table WHERE type = 'tool'")['c'] ?? 0;
+                    if ($coding_count == 0) {
                         foreach (($defaults['coding'] ?? []) as $i => $item) {
                             $item['type'] = 'coding';
                             $item['sort_order'] = $i;
                             self::saveItem('skills', $item);
                         }
+                    }
+                    if ($tools_count == 0) {
                         foreach (($defaults['tools'] ?? []) as $i => $item) {
                             $item['type'] = 'tool';
                             $item['sort_order'] = $i;
                             self::saveItem('skills', $item);
                         }
-                    } else {
-                        foreach ($defaults as $i => $item) {
-                            $item['sort_order'] = $i;
-                            self::saveItem($section, $item);
-                        }
+                    }
+                } elseif ($count == 0) {
+                    $defaults = self::getDefaults($section);
+                    foreach ($defaults as $i => $item) {
+                        $item['sort_order'] = $i;
+                        self::saveItem($section, $item);
                     }
                 }
             } catch (\Exception $e) {
@@ -265,8 +311,8 @@ class DataStore
                 'greeting'       => 'Hello, I am',
                 'name'           => 'Alfred Kaliisa',
                 'title'          => 'Full-Stack Developer & Digital Creative',
-                'photo'          => '/assets/img/IMG_20260304_010335_441.webp',
-                'logo'           => '/assets/img/LogoWiz_02032026_173518.JPEG',
+                'photo'          => '/uploads/img_20260304_010335_441_69b06531c089f.webp',
+                'logo'           => '/uploads/logowiz_02032026_173518_69b05669498e3.jpg',
                 'github'         => '#',
                 'linkedin'       => '#',
                 'twitter'        => '#',
@@ -275,10 +321,10 @@ class DataStore
                 'portfolio_link' => '#portfolio',
             ],
             'about' => [
-                'bio1'  => 'I am a passionate <span class="text-green-500 font-semibold">Full-Stack Developer</span> and <span class="text-gold-500 font-semibold">Digital Creative</span> with over 8 years of experience delivering innovative digital solutions. Currently based in Kampala, Uganda, I sit at the unique intersection of technical engineering and artistic creation.',
+                'bio1'  => 'I am a passionate <span class="text-green-500 font-semibold">Full-Stack Developer</span> and <span class="text-gold-500 font-semibold">Digital Creative</span> with 3+ years of professional industry experience delivering innovative digital solutions. Currently based in Kampala, Uganda, I sit at the unique intersection of technical engineering and artistic creation.',
                 'bio2'  => 'Specializing in both front-end and back-end development, I combine technical proficiency with a creative mindset to craft user-centered, visually engaging, and high-performing web solutions. Whether I\'m teaching the next generation of devs at SaiPali Institute or building brands through Curl.Inc Media, my goal remains the same: <span class="text-white italic">to innovate and inspire.</span>',
                 'stats' => [
-                    ['value' => '8+',   'label' => 'Years Exp.'],
+                    ['value' => '3+',   'label' => 'Years Exp.'],
                     ['value' => '50+',  'label' => 'Projects'],
                     ['value' => '2',    'label' => 'Ventures'],
                     ['value' => '100%', 'label' => 'Satisfaction'],
@@ -293,18 +339,18 @@ class DataStore
                     ['name' => 'PHP',               'percent' => 82],
                 ],
                 'tools' => [
-                    ['name' => 'React.js',    'icon' => 'fab fa-react',    'color' => 'text-blue-400',   'desc' => 'Frontend Library'],
-                    ['name' => 'Node.js',     'icon' => 'fab fa-node',     'color' => 'text-green-500',  'desc' => 'Backend Runtime'],
-                    ['name' => 'Adobe Suite', 'icon' => 'fab fa-adobe',    'color' => 'text-red-500',    'desc' => 'Ps, Ai, Id, Pr'],
-                    ['name' => 'Photography', 'icon' => 'fas fa-camera',   'color' => 'text-slate-200',  'desc' => 'Visual Storytelling'],
-                    ['name' => 'Git/GitHub',  'icon' => 'fab fa-git-alt',  'color' => 'text-orange-500', 'desc' => 'Version Control'],
-                    ['name' => 'MySQL',       'icon' => 'fas fa-database', 'color' => 'text-blue-300',   'desc' => 'Database Mgmt'],
+                    ['name' => 'React.js',    'icon' => 'fab fa-react',    'color' => 'text-blue-400',   'description' => 'Frontend Library'],
+                    ['name' => 'Node.js',     'icon' => 'fab fa-node',     'color' => 'text-green-500',  'description' => 'Backend Runtime'],
+                    ['name' => 'Adobe Suite', 'icon' => 'fab fa-adobe',    'color' => 'text-red-500',    'description' => 'Ps, Ai, Id, Pr'],
+                    ['name' => 'Photography', 'icon' => 'fas fa-camera',   'color' => 'text-slate-200',  'description' => 'Visual Storytelling'],
+                    ['name' => 'Git/GitHub',  'icon' => 'fab fa-git-alt',  'color' => 'text-orange-500', 'description' => 'Version Control'],
+                    ['name' => 'MySQL',       'icon' => 'fas fa-database', 'color' => 'text-blue-300',   'description' => 'Database Mgmt'],
                 ],
             ],
             'experience' => [
                 [
                     'period'  => '2024 - Present',
-                    'title'   => 'Junior IT Trainer',
+                    'title'   => 'IT Trainer & Curriculum Developer',
                     'company' => 'SaiPali Institute of Technology and Management, Entebbe',
                     'bullets' => [
                         'Training diploma students in web development & software engineering.',
@@ -314,8 +360,8 @@ class DataStore
                 ],
                 [
                     'period'  => '2013 - Present',
-                    'title'   => 'Freelance Graphic Designer & Web Developer',
-                    'company' => 'Self-Employed',
+                    'title'   => 'Freelance Web Developer & Digital Creative',
+                    'company' => 'Independent Client Projects',
                     'bullets' => [
                         'Designing marketing collateral (logos, brochures, posters).',
                         'Building responsive, high-performance websites.',
@@ -325,75 +371,51 @@ class DataStore
             ],
             'portfolio' => [
                 [
-                    'title'       => 'Corporate Website',
-                    'category'    => 'Web Development',
+                    'title'       => 'Sai Pali Institute Website',
+                    'category'    => 'Education Website',
                     'cat_color'   => 'green',
-                    'description' => 'Responsive corporate website with modern design and CMS integration.',
-                    'icon'        => 'fas fa-globe',
+                    'description' => 'Role: Lead Web Developer & Content Strategist. Built and launched the institutional website for Sai Pali Institute with clear program pages, campus storytelling, and admissions-focused user flows to improve information clarity for prospective students.',
+                    'icon'        => 'fas fa-graduation-cap',
                     'icon_color'  => 'text-green-500',
                     'bg_gradient' => 'from-green-500/20 to-gold-500/20',
-                    'tags'        => ['WordPress', 'PHP', 'CSS'],
-                    'link'        => '#',
+                    'tags'        => ['Web Development', 'Responsive Design', 'Information Architecture', 'On-Page SEO'],
+                    'link'        => 'https://saipali.education',
                     'image'       => '',
                 ],
                 [
-                    'title'       => 'Brand Identity Design',
-                    'category'    => 'Branding',
-                    'cat_color'   => 'gold',
-                    'description' => 'Complete brand identity package including logo, colors, and marketing materials.',
-                    'icon'        => 'fas fa-palette',
-                    'icon_color'  => 'text-gold-500',
-                    'bg_gradient' => 'from-gold-500/20 to-green-500/20',
-                    'tags'        => ['Illustrator', 'Photoshop'],
-                    'link'        => '#',
-                    'image'       => '',
-                ],
-                [
-                    'title'       => 'Online Store',
-                    'category'    => 'E-Commerce',
+                    'title'       => 'Onatti Foundation Website',
+                    'category'    => 'Nonprofit Website',
                     'cat_color'   => 'blue',
-                    'description' => 'Full-featured e-commerce platform with payment integration.',
-                    'icon'        => 'fas fa-shopping-cart',
+                    'description' => 'Role: Web Developer & Digital Creative. Developed Onatti Foundation\'s web presence to communicate mission, programs, and donation journeys with stronger storytelling and clearer calls to action for supporters.',
+                    'icon'        => 'fas fa-hand-holding-heart',
                     'icon_color'  => 'text-blue-400',
                     'bg_gradient' => 'from-blue-500/20 to-purple-500/20',
-                    'tags'        => ['WooCommerce', 'JavaScript'],
-                    'link'        => '#',
+                    'tags'        => ['Nonprofit UX', 'Content Strategy', 'Donation Funnel UX', 'Accessibility'],
+                    'link'        => 'https://www.onatti.org/',
                     'image'       => '',
                 ],
                 [
-                    'title'       => 'Mobile App Interface',
-                    'category'    => 'UI/UX Design',
+                    'title'       => 'Service Business Website & Booking Flow',
+                    'category'    => 'Web Development',
+                    'cat_color'   => 'gold',
+                    'description' => 'Created a conversion-focused website with inquiry and booking workflows, improving lead quality and reducing response turnaround time.',
+                    'icon'        => 'fas fa-globe',
+                    'icon_color'  => 'text-gold-500',
+                    'bg_gradient' => 'from-gold-500/20 to-green-500/20',
+                    'tags'        => ['WordPress', 'Elementor', 'SEO'],
+                    'link'        => '',
+                    'image'       => '',
+                ],
+                [
+                    'title'       => 'Brand Identity & Marketing Assets Suite',
+                    'category'    => 'Branding',
                     'cat_color'   => 'purple',
-                    'description' => 'User-friendly mobile application interface with intuitive navigation.',
-                    'icon'        => 'fas fa-mobile-alt',
+                    'description' => 'Delivered complete visual identity systems including logos, color systems, and social campaign assets for small businesses.',
+                    'icon'        => 'fas fa-palette',
                     'icon_color'  => 'text-purple-400',
                     'bg_gradient' => 'from-purple-500/20 to-pink-500/20',
-                    'tags'        => ['Figma', 'React'],
-                    'link'        => '#',
-                    'image'       => '',
-                ],
-                [
-                    'title'       => 'Photography Portfolio',
-                    'category'    => 'Photography',
-                    'cat_color'   => 'red',
-                    'description' => 'Professional photography portfolio with gallery and client booking.',
-                    'icon'        => 'fas fa-camera',
-                    'icon_color'  => 'text-red-400',
-                    'bg_gradient' => 'from-red-500/20 to-orange-500/20',
-                    'tags'        => ['HTML5', 'Lightroom'],
-                    'link'        => '#',
-                    'image'       => '',
-                ],
-                [
-                    'title'       => 'Business Dashboard',
-                    'category'    => 'Web App',
-                    'cat_color'   => 'cyan',
-                    'description' => 'Analytics dashboard for business management with real-time data.',
-                    'icon'        => 'fas fa-code-branch',
-                    'icon_color'  => 'text-cyan-400',
-                    'bg_gradient' => 'from-cyan-500/20 to-teal-500/20',
-                    'tags'        => ['React', 'Node.js', 'MySQL'],
-                    'link'        => '#',
+                    'tags'        => ['Illustrator', 'Photoshop', 'Canva'],
+                    'link'        => '',
                     'image'       => '',
                 ],
             ],

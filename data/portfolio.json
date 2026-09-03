@@ -1,88 +1,64 @@
 [
     {
-        "title": "Corporate Website",
-        "category": "Web Development",
+        "title": "Sai Pali Institute Website",
+        "category": "Education Website",
         "cat_color": "green",
-        "description": "Responsive corporate website with modern design and CMS integration.",
-        "icon": "fas fa-globe",
+        "description": "Role: Lead Web Developer & Content Strategist. Built and launched the institutional website for Sai Pali Institute with clear program pages, campus storytelling, and admissions-focused user flows to improve information clarity for prospective students.",
+        "icon": "fas fa-graduation-cap",
         "icon_color": "text-green-500",
         "bg_gradient": "from-green-500\/20 to-gold-500\/20",
         "tags": [
-            "WordPress",
-            "PHP",
-            "CSS"
+            "Web Development",
+            "Responsive Design",
+            "Information Architecture",
+            "On-Page SEO"
         ],
-        "link": "#"
+        "link": "https:\/\/saipali.education"
     },
     {
-        "title": "Brand Identity Design",
-        "category": "Branding",
-        "cat_color": "gold",
-        "description": "Complete brand identity package including logo, colors, and marketing materials.",
-        "icon": "fas fa-palette",
-        "icon_color": "text-gold-500",
-        "bg_gradient": "from-gold-500\/20 to-green-500\/20",
-        "tags": [
-            "Illustrator",
-            "Photoshop"
-        ],
-        "link": "#"
-    },
-    {
-        "title": "Online Store",
-        "category": "E-Commerce",
+        "title": "Onatti Foundation Website",
+        "category": "Nonprofit Website",
         "cat_color": "blue",
-        "description": "Full-featured e-commerce platform with payment integration and inventory management.",
-        "icon": "fas fa-shopping-cart",
+        "description": "Role: Web Developer & Digital Creative. Developed Onatti Foundation's web presence to communicate mission, programs, and donation journeys with stronger storytelling and clearer calls to action for supporters.",
+        "icon": "fas fa-hand-holding-heart",
         "icon_color": "text-blue-400",
         "bg_gradient": "from-blue-500\/20 to-purple-500\/20",
         "tags": [
-            "WooCommerce",
-            "JavaScript"
+            "Nonprofit UX",
+            "Content Strategy",
+            "Donation Funnel UX",
+            "Accessibility"
         ],
-        "link": "#"
+        "link": "https:\/\/www.onatti.org\/"
     },
     {
-        "title": "Mobile App Interface",
-        "category": "UI\/UX Design",
+        "title": "Service Business Website & Booking Flow",
+        "category": "Web Development",
+        "cat_color": "gold",
+        "description": "Created a conversion-focused website with inquiry and booking workflows, improving lead quality and reducing response turnaround time.",
+        "icon": "fas fa-globe",
+        "icon_color": "text-gold-500",
+        "bg_gradient": "from-gold-500\/20 to-green-500\/20",
+        "tags": [
+            "WordPress",
+            "Elementor",
+            "SEO"
+        ],
+        "link": ""
+    },
+    {
+        "title": "Brand Identity & Marketing Assets Suite",
+        "category": "Branding",
         "cat_color": "purple",
-        "description": "User-friendly mobile application interface with intuitive navigation and modern aesthetics.",
-        "icon": "fas fa-mobile-alt",
+        "description": "Delivered complete visual identity systems including logos, color systems, and social campaign assets for small businesses.",
+        "icon": "fas fa-palette",
         "icon_color": "text-purple-400",
         "bg_gradient": "from-purple-500\/20 to-pink-500\/20",
         "tags": [
-            "Figma",
-            "React"
+            "Illustrator",
+            "Photoshop",
+            "Canva"
         ],
-        "link": "#"
-    },
-    {
-        "title": "Photography Portfolio",
-        "category": "Photography",
-        "cat_color": "red",
-        "description": "Professional photography portfolio website with gallery and client booking system.",
-        "icon": "fas fa-camera",
-        "icon_color": "text-red-400",
-        "bg_gradient": "from-red-500\/20 to-orange-500\/20",
-        "tags": [
-            "HTML5",
-            "Lightroom"
-        ],
-        "link": "#"
-    },
-    {
-        "title": "Business Dashboard",
-        "category": "Web App",
-        "cat_color": "cyan",
-        "description": "Analytics dashboard for business management with real-time data visualization.",
-        "icon": "fas fa-code-branch",
-        "icon_color": "text-cyan-400",
-        "bg_gradient": "from-cyan-500\/20 to-teal-500\/20",
-        "tags": [
-            "React",
-            "Node.js",
-            "MySQL"
-        ],
-        "link": "#"
+        "link": ""
     }
 ]

@@ -4,10 +4,18 @@ session_start();
 require_once ROOT_PATH . '/includes/auth.php';
 require_once ROOT_PATH . '/includes/datastore.php';
 
+$admin_url = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/admin/index.php')), '/');
+$project_url = dirname($admin_url);
+$project_url = $project_url === '/' || $project_url === '.' ? '' : rtrim($project_url, '/');
+$asset_url = static function (?string $url) use ($project_url): string {
+  if (!$url || preg_match('~^(https?:|data:|#)~', $url) || $url[0] !== '/') return $url ?? '';
+  return $project_url . $url;
+};
+
 // Handle login/logout
 if (isset($_GET['action']) && $_GET['action'] === 'logout') {
   Auth::logout();
-  header('Location: /admin');
+  header('Location: ' . $admin_url . '/index.php');
   exit;
 }
 
@@ -15,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
   $username = trim($_POST['username'] ?? '');
   $password = $_POST['password'] ?? '';
   if (Auth::login($username, $password)) {
-    header('Location: /admin');
+    header('Location: ' . $admin_url . '/index.php');
     exit;
   } else {
     $login_error = 'Invalid credentials. Default: alfred / alfred2024';
@@ -43,7 +51,7 @@ if (Auth::isLoggedIn()) {
 }
 
 // Fetch favicon from hero logo
-$hero_icon = ($all_data['hero']['logo'] ?? null) ?: (DataStore::get('hero')['logo'] ?? '/assets/img/LogoWiz_02032026_173518.JPEG');
+$hero_icon = ($all_data['hero']['logo'] ?? null) ?: (DataStore::get('hero')['logo'] ?? '/uploads/logowiz_02032026_173518_69b05669498e3.jpg');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -52,45 +60,11 @@ $hero_icon = ($all_data['hero']['logo'] ?? null) ?: (DataStore::get('hero')['log
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Alfred Portfolio CMS</title>
-  <link rel="icon" type="image/x-icon" href="<?= htmlspecialchars($hero_icon) ?>">
+  <link rel="icon" type="image/x-icon" href="<?= htmlspecialchars($asset_url($hero_icon)) ?>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            navy: {
-              800: '#1e293b',
-              900: '#0f172a',
-              950: '#020617'
-            },
-            gold: {
-              400: '#FFC107',
-              500: '#FFA000'
-            },
-            green: {
-              500: '#66BB6A'
-            },
-            cms: {
-              bg: '#0d1117',
-              sidebar: '#161b22',
-              card: '#21262d',
-              border: '#30363d',
-              hover: '#2d333b',
-              accent: '#238636',
-              accentHov: '#2ea043',
-            }
-          },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif']
-          },
-        }
-      }
-    };
-  </script>
+  <link rel="stylesheet" href="../assets/css/tailwind.min.css">
   <script crossorigin src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js"></script>
@@ -313,7 +287,8 @@ $hero_icon = ($all_data['hero']['logo'] ?? null) ?: (DataStore::get('hero')['log
     <script>
       window.__CMS_DATA__ = <?= $cms_data_json ?>;
       window.__DELETED_DATA__ = <?= $deleted_data_json ?>;
-      window.__API_BASE__ = '/api';
+      window.__API_BASE__ = '<?= htmlspecialchars($project_url) ?>/api';
+      window.__ASSET_BASE__ = '<?= htmlspecialchars($project_url) ?>';
     </script>
 
     <script type="text/babel">
@@ -381,7 +356,7 @@ function ImageUpload({ label, value, onChange, section = 'general' }) {
     formData.append('section', section);
 
     try {
-      const res = await fetch('/api/upload.php', {
+      const res = await fetch(`${window.__API_BASE__}/upload.php`, {
         method: 'POST',
         body: formData,
       });
@@ -405,7 +380,7 @@ function ImageUpload({ label, value, onChange, section = 'general' }) {
       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
         {value && (
           <div style={{ width: 60, height: 60, borderRadius: 6, overflow: 'hidden', border: '1px solid #30363d', background: '#161b22' }}>
-            <img src={value} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Preview" />
+            <img src={value && value.startsWith('/') ? window.__ASSET_BASE__ + value : value} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Preview" />
           </div>
         )}
         <div style={{ flex: 1 }}>
@@ -852,7 +827,7 @@ function SettingsEditor({ data, onSave }) {
           <button className="cms-btn-primary" onClick={async () => {
             const pass = document.getElementById('new-password').value;
             if(!pass) return;
-            const res = await fetch('/api/cms.php', {
+            const res = await fetch(`${window.__API_BASE__}/cms.php`, {
               method: 'POST',
               headers: {'Content-Type':'application/json'},
               body: JSON.stringify({action:'change_password', new_password: pass})
@@ -872,18 +847,18 @@ function MessagesView() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    fetch('/api/contact.php?action=list')
+    fetch(`${window.__API_BASE__}/contact.php?action=list`)
       .then(r=>r.json())
       .then(data=>{ setMessages(data.messages||[]); setLoading(false); })
       .catch(()=>setLoading(false));
   }, []);
   const deleteMsg = (id) => {
-    fetch(`/api/contact.php?action=delete&id=${id}`, {method:'DELETE'})
+    fetch(`${window.__API_BASE__}/contact.php?action=delete&id=${id}`, {method:'DELETE'})
       .then(r=>r.json())
       .then(()=>setMessages(m=>m.filter(msg=>msg.id !== parseInt(id))));
   };
   const markRead = (id) => {
-    fetch(`/api/contact.php?action=read&id=${id}`, {method:'PATCH'})
+    fetch(`${window.__API_BASE__}/contact.php?action=read&id=${id}`, {method:'PATCH'})
       .then(r=>r.json())
       .then(()=>setMessages(m=>m.map(msg=>msg.id === id ? {...msg, is_read: 1} : msg)));
   };
@@ -936,7 +911,7 @@ function MessagesView() {
 function ReportingView() {
   const [stats, setStats] = useState(null);
   useEffect(() => {
-    $.get('/api/reports.php', (res) => {
+    $.get(`${window.__API_BASE__}/reports.php`, (res) => {
         if(res.success) setStats(res);
     });
   }, []);
@@ -1128,7 +1103,7 @@ function CMS() {
 
         {/* Footer */}
         <div style={{padding:'16px',borderTop:'1px solid #30363d'}}>
-          <a href="/" target="_blank" style={{display:'flex',alignItems:'center',gap:8,color:'#6e7681',fontSize:12,marginBottom:8,textDecoration:'none',padding:'8px',borderRadius:6}}>
+          <a href="<?= htmlspecialchars(dirname($admin_url)) ?>/index.php" target="_blank" style={{display:'flex',alignItems:'center',gap:8,color:'#6e7681',fontSize:12,marginBottom:8,textDecoration:'none',padding:'8px',borderRadius:6}}>
             <i className="fas fa-external-link-alt"></i> View Site
           </a>
           <a href="?action=logout" style={{display:'flex',alignItems:'center',gap:8,color:'#f85149',fontSize:12,padding:8,borderRadius:6,textDecoration:'none'}}>
@@ -1143,7 +1118,7 @@ function CMS() {
            </div>
            <script dangerouslySetInnerHTML={{__html: `
               function checkPulse() {
-                 $.get('/api/reports.php')
+                 $.get(window.__API_BASE__ + '/reports.php')
                   .done(function() { 
                     $('#pulse-dot').css('background', '#238636'); 
                     $('#ajax-pulse span').text('SERVER ONLINE (AJAX PULSE)');

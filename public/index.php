@@ -13,6 +13,19 @@ $education   = DataStore::get('education');
 $contact     = DataStore::get('contact');
 $settings    = DataStore::get('site_settings');
 
+$script_path = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '/index.php');
+$app_base_url = dirname($script_path);
+if (basename($app_base_url) === 'public') {
+    $app_base_url = dirname($app_base_url);
+}
+$app_base_url = $app_base_url === '/' || $app_base_url === '.' ? '' : rtrim($app_base_url, '/');
+$asset_url = static function (?string $url) use ($app_base_url): string {
+    if (!$url || preg_match('~^(https?:|data:|#)~', $url) || $url[0] !== '/') {
+        return $url ?? '';
+    }
+    return $app_base_url . $url;
+};
+
 $cat_colors = [
     'green'  => ['bg' => 'bg-green-500/20', 'text' => 'text-green-500'],
     'gold'   => ['bg' => 'bg-gold-500/20',  'text' => 'text-gold-500'],
@@ -31,10 +44,10 @@ $cat_colors = [
 
     <?php
     $site_title    = htmlspecialchars($settings['site_title']       ?? 'Alfred Kaliisa | Full-Stack Developer & Digital Creative');
-    $meta_desc     = htmlspecialchars($settings['meta_description'] ?? 'Alfred Kaliisa is a Full-Stack Developer and Digital Creative based in Kampala, Uganda. 8+ years delivering web development, branding, and digital solutions.');
+    $meta_desc     = htmlspecialchars($settings['meta_description'] ?? 'Alfred Kaliisa is a Full-Stack Developer and Digital Creative based in Kampala, Uganda. 3+ years delivering web development, branding, and digital solutions.');
     $hero_name     = htmlspecialchars($hero['name']   ?? 'Alfred Kaliisa');
     $hero_title    = htmlspecialchars($hero['title']  ?? 'Full-Stack Developer & Digital Creative');
-    $hero_photo    = htmlspecialchars($hero['photo']  ?? '/assets/img/IMG_20260304_010335_441.webp');
+    $hero_photo    = htmlspecialchars($asset_url($hero['photo'] ?? '/uploads/img_20260304_010335_441_69b06531c089f.webp'));
     $canonical_url = 'https://' . ($_SERVER['HTTP_HOST'] ?? 'alfred.chrysalisdigitals.com') . '/';
     ?>
 
@@ -62,7 +75,7 @@ $cat_colors = [
     <meta name="twitter:image"       content="<?= $hero_photo ?>">
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="<?= htmlspecialchars($hero['logo'] ?? '/assets/img/LogoWiz_02032026_173518.JPEG') ?>">
+    <link rel="icon" type="image/jpeg" href="<?= htmlspecialchars($asset_url($hero['logo'] ?? '/uploads/logowiz_02032026_173518_69b05669498e3.jpg')) ?>">
 
     <!-- JSON-LD Structured Data (Person) -->
     <script type="application/ld+json">
@@ -71,7 +84,7 @@ $cat_colors = [
       "@type": "Person",
       "name": "<?= addslashes($hero['name'] ?? 'Alfred Kaliisa') ?>",
       "url": "<?= $canonical_url ?>",
-      "image": "<?= addslashes($hero['photo'] ?? '') ?>",
+    "image": "<?= addslashes($asset_url($hero['photo'] ?? '')) ?>",
       "jobTitle": "<?= addslashes($hero['title'] ?? 'Full-Stack Developer & Digital Creative') ?>",
       "description": "<?= addslashes($settings['meta_description'] ?? '') ?>",
       "address": {
@@ -99,43 +112,16 @@ $cat_colors = [
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        navy: {
-                            800: '#1e293b',
-                            900: '#0f172a',
-                            950: '#020617'
-                        },
-                        gold: {
-                            400: '#FFC107',
-                            500: '#FFA000',
-                            600: '#FF8F00'
-                        },
-                        green: {
-                            400: '#7CB342',
-                            500: '#66BB6A',
-                            600: '#4CAF50'
-                        },
-                    },
-                    fontFamily: {
-                        sans: ['Open Sans', 'sans-serif'],
-                        serif: ['Merriweather', 'serif'],
-                    },
-                },
-            },
-        };
-    </script>
+    <link rel="stylesheet" href="assets/css/tailwind.min.css">
 
     <!-- React & jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script crossorigin src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@babel/standalone@7/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/Observer.min.js"></script>
 
     <style>
         @keyframes fadeIn {
@@ -421,7 +407,7 @@ $cat_colors = [
     <nav id="navbar" class="fixed w-full z-50 bg-navy-900/90 backdrop-blur-md border-b border-white/10 transition-all">
         <div class="max-w-6xl mx-auto px-4 md:px-6 py-3 flex justify-between items-center">
             <a href="#home" class="flex items-center">
-                <img src="<?= htmlspecialchars($hero['logo'] ?? '/assets/img/LogoWiz_02032026_173518.JPEG') ?>"
+                <img src="<?= htmlspecialchars($asset_url($hero['logo'] ?? '/uploads/logowiz_02032026_173518_69b05669498e3.jpg')) ?>"
                     style="height:52px;" alt="<?= htmlspecialchars($hero['name']) ?> Logo"
                     class="w-auto hover:scale-110 transition-transform duration-300">
             </a>
@@ -429,7 +415,7 @@ $cat_colors = [
                 <?php foreach (($settings['nav_links'] ?? ['About', 'Skills', 'Experience', 'Portfolio', 'Ventures', 'Contact']) as $link): ?>
                     <a href="#<?= strtolower($link) ?>" class="hover:text-green-500 transition-colors"><?= htmlspecialchars($link) ?></a>
                 <?php endforeach; ?>
-                <a href="/admin" class="text-green-500 hover:text-white transition-colors border-l border-white/10 pl-4">Login</a>
+                <a href="<?= htmlspecialchars($app_base_url) ?>/admin/index.php" class="border-l border-white/10 pl-8 text-green-500 hover:text-white transition-colors">Login</a>
             </div>
             <!-- Hamburger -->
             <div class="flex items-center gap-4">
@@ -448,7 +434,7 @@ $cat_colors = [
                     <?= htmlspecialchars($link) ?>
                 </a>
             <?php endforeach; ?>
-            <a href="/admin" class="block py-3 text-sm font-semibold uppercase tracking-widest text-green-500 hover:text-white transition-colors border-b border-white/5 mobile-menu-link">CMS Login</a>
+            <a href="<?= htmlspecialchars($app_base_url) ?>/admin/index.php" class="block py-3 text-sm font-semibold uppercase tracking-widest text-green-500 hover:text-white transition-colors border-b border-white/5 mobile-menu-link">CMS Login</a>
         </div>
     </nav>
 
@@ -489,20 +475,27 @@ $cat_colors = [
                 <div class="mt-8 md:mt-10 flex gap-6 text-slate-500">
                     <a href="<?= htmlspecialchars($hero['github'] ?? '#') ?>" aria-label="GitHub" class="hover:text-green-500 text-2xl transition-all hover:scale-125"><i class="fab fa-github"></i></a>
                     <a href="<?= htmlspecialchars($hero['linkedin'] ?? '#') ?>" aria-label="LinkedIn" class="hover:text-green-500 text-2xl transition-all hover:scale-125"><i class="fab fa-linkedin"></i></a>
-                    <a href="<?= htmlspecialchars($hero['twitter'] ?? '#') ?>" aria-label="Twitter" class="hover:text-green-500 text-2xl transition-all hover:scale-125"><i class="fab fa-twitter"></i></a>
+                    <a href="<?= htmlspecialchars($hero['twitter'] ?? '#') ?>" aria-label="X (formerly Twitter)" class="hover:text-green-500 text-2xl transition-all hover:scale-125"><span class="social-x-icon font-bold text-xl leading-none" aria-hidden="true">X</span></a>
                     <a href="<?= htmlspecialchars($hero['instagram'] ?? '#') ?>" aria-label="Instagram" class="hover:text-green-500 text-2xl transition-all hover:scale-125"><i class="fab fa-instagram"></i></a>
                 </div>
             </div>
             <div class="order-1 md:order-2 flex justify-center animate-fade-in delay-200">
-                <div class="relative mx-4">
+                <div id="hero-portrait" class="relative mx-4">
                     <div class="absolute inset-0 border-4 border-green-500 rounded-lg transform translate-x-4 translate-y-4 md:translate-x-6 md:translate-y-6"></div>
-                    <img src="<?= htmlspecialchars($hero['photo'] ?? '/assets/img/IMG_20260304_010335_441.webp') ?>"
+                    <img src="<?= htmlspecialchars($asset_url($hero['photo'] ?? '/uploads/img_20260304_010335_441_69b06531c089f.webp')) ?>"
                         alt="<?= htmlspecialchars($hero['name'] ?? 'Alfred Kaliisa') ?> - Portfolio Photo"
                         class="w-52 h-52 sm:w-64 sm:h-64 md:w-96 md:h-96 object-cover rounded-lg border-4 border-gold-500 shadow-2xl relative z-10 hover:shadow-green-500/50 transition-all duration-700 glow-on-hover">
                 </div>
             </div>
         </div>
     </section>
+
+    <div class="relative overflow-hidden border-y border-white/10 bg-navy-950 py-3 text-xs font-bold uppercase tracking-[0.35em] text-green-500" aria-hidden="true">
+        <div class="portfolio-marquee flex w-max gap-10 whitespace-nowrap">
+            <span>Code with character</span><span class="text-gold-500">&bull;</span><span>Ideas in motion</span><span class="text-gold-500">&bull;</span><span>Digital craft, Kampala</span><span class="text-gold-500">&bull;</span>
+            <span>Code with character</span><span class="text-gold-500">&bull;</span><span>Ideas in motion</span><span class="text-gold-500">&bull;</span><span>Digital craft, Kampala</span><span class="text-gold-500">&bull;</span>
+        </div>
+    </div>
 
     <!-- ========= ABOUT SECTION ========= -->
     <section id="about" class="py-24 bg-navy-800 relative">
@@ -522,7 +515,7 @@ $cat_colors = [
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10 pt-10 border-t border-white/10 text-center">
                     <?php foreach (($about['stats'] ?? []) as $stat): ?>
                         <div>
-                            <span class="block text-3xl font-bold text-white mb-1"><?= htmlspecialchars($stat['value']) ?></span>
+                            <span class="stat-value block text-3xl font-bold text-white mb-1"><?= htmlspecialchars($stat['value']) ?></span>
                             <span class="text-xs uppercase tracking-wider text-slate-500"><?= htmlspecialchars($stat['label']) ?></span>
                         </div>
                     <?php endforeach; ?>
@@ -623,7 +616,7 @@ $cat_colors = [
                     <div class="group relative overflow-hidden rounded-lg bg-navy-800 border border-white/5 hover:border-green-500 transition-all glow-on-hover">
                         <div class="aspect-video bg-navy-800 flex items-center justify-center relative overflow-hidden">
                             <?php if (!empty($project['image'])): ?>
-                                <img src="<?= htmlspecialchars($project['image']) ?>" alt="<?= htmlspecialchars($project['title']) ?>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                <img src="<?= htmlspecialchars($asset_url($project['image'])) ?>" alt="<?= htmlspecialchars($project['title']) ?>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                             <?php else: ?>
                                 <div class="w-full h-full bg-gradient-to-br <?= htmlspecialchars($project['bg_gradient']) ?> flex items-center justify-center">
                                     <i class="<?= htmlspecialchars($project['icon']) ?> text-6xl <?= htmlspecialchars($project['icon_color']) ?> opacity-50 group-hover:scale-110 transition-transform"></i>
@@ -670,7 +663,7 @@ $cat_colors = [
                         <div class="relative z-20 p-10 h-full flex flex-col justify-end min-h-[300px] group-hover:-translate-y-2 transition-transform duration-300">
                             <div class="w-16 h-16 bg-white rounded-lg flex items-center justify-center mb-6 text-navy-900 text-2xl font-bold overflow-hidden">
                                 <?php if (!empty($venture['logo'])): ?>
-                                    <img src="<?= htmlspecialchars($venture['logo']) ?>" alt="<?= htmlspecialchars($venture['name']) ?>" class="w-full h-full object-cover">
+                                    <img src="<?= htmlspecialchars($asset_url($venture['logo'])) ?>" alt="<?= htmlspecialchars($venture['name']) ?>" class="w-full h-full object-cover">
                                 <?php else: ?>
                                     <?= htmlspecialchars($venture['initial']) ?>
                                 <?php endif; ?>
@@ -738,13 +731,14 @@ $cat_colors = [
             <div id="contact-form-root" class="mt-16"></div>
 
             <div class="mt-16 pt-8 border-t border-white/5 text-slate-500 text-sm">
-                <p>© <?= htmlspecialchars($contact['copyright_year'] ?? date('Y')) ?> <?= htmlspecialchars($hero['name'] ?? 'Alfred Kaliisa') ?>. All Rights Reserved. • <a href="/admin" class="hover:text-green-500 transition-colors">CMS Login</a></p>
+                <p>© <?= htmlspecialchars($contact['copyright_year'] ?? date('Y')) ?> <?= htmlspecialchars($hero['name'] ?? 'Alfred Kaliisa') ?>. All Rights Reserved.</p>
                 <div class="mt-2 text-xs"><?= htmlspecialchars($contact['location'] ?? 'Kampala, Uganda') ?> • <?= htmlspecialchars($contact['availability'] ?? 'Freelance Available') ?></div>
             </div>
         </div>
     </section>
 
     <!-- Back to Top -->
+    <div id="scroll-progress" class="fixed left-0 top-0 z-[60] h-1 w-0 origin-left bg-gradient-to-r from-green-500 via-gold-500 to-green-500" aria-hidden="true"></div>
     <a href="#home" class="fixed bottom-8 right-8 bg-gradient-to-r from-green-500 to-gold-500 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:-translate-y-1 hover:shadow-green-500/50 transition-all z-50">
         <i class="fas fa-arrow-up"></i>
     </a>
@@ -783,7 +777,7 @@ $cat_colors = [
         e.preventDefault();
         setStatus('sending');
         $.ajax({
-          url: '/api/contact.php',
+          url: '<?= htmlspecialchars($app_base_url) ?>/api/contact.php',
           type: 'POST',
           contentType: 'application/json',
           data: JSON.stringify(form),
@@ -925,6 +919,7 @@ $cat_colors = [
             updateThemeIcon();
         });
     </script>
+    <script src="<?= htmlspecialchars($app_base_url) ?>/assets/js/optimize.min.js"></script>
 </body>
 
 </html>
