@@ -28,9 +28,67 @@ $cat_colors = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($settings['site_title'] ?? 'Alfred Kaliisa | Portfolio') ?></title>
-    <meta name="description" content="<?= htmlspecialchars($settings['meta_description'] ?? '') ?>">
+
+    <?php
+    $site_title    = htmlspecialchars($settings['site_title']       ?? 'Alfred Kaliisa | Full-Stack Developer & Digital Creative');
+    $meta_desc     = htmlspecialchars($settings['meta_description'] ?? 'Alfred Kaliisa is a Full-Stack Developer and Digital Creative based in Kampala, Uganda. 8+ years delivering web development, branding, and digital solutions.');
+    $hero_name     = htmlspecialchars($hero['name']   ?? 'Alfred Kaliisa');
+    $hero_title    = htmlspecialchars($hero['title']  ?? 'Full-Stack Developer & Digital Creative');
+    $hero_photo    = htmlspecialchars($hero['photo']  ?? '/assets/img/IMG_20260304_010335_441.webp');
+    $canonical_url = 'https://' . ($_SERVER['HTTP_HOST'] ?? 'alfred.chrysalisdigitals.com') . '/';
+    ?>
+
+    <title><?= $site_title ?></title>
+    <meta name="description" content="<?= $meta_desc ?>">
+    <meta name="keywords" content="Alfred Kaliisa, Full-Stack Developer, Web Developer Uganda, Graphic Designer Kampala, PHP Developer, WordPress Developer, Freelance Developer Uganda, Digital Creative">
+    <meta name="author" content="<?= $hero_name ?>">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="<?= $canonical_url ?>">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="<?= $canonical_url ?>sitemap.xml">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type"        content="website">
+    <meta property="og:url"         content="<?= $canonical_url ?>">
+    <meta property="og:title"       content="<?= $site_title ?>">
+    <meta property="og:description" content="<?= $meta_desc ?>">
+    <meta property="og:image"       content="<?= $hero_photo ?>">
+    <meta property="og:locale"      content="en_UG">
+    <meta property="og:site_name"   content="<?= $hero_name ?> Portfolio">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card"        content="summary_large_image">
+    <meta name="twitter:title"       content="<?= $site_title ?>">
+    <meta name="twitter:description" content="<?= $meta_desc ?>">
+    <meta name="twitter:image"       content="<?= $hero_photo ?>">
+
+    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="<?= htmlspecialchars($hero['logo'] ?? '/assets/img/LogoWiz_02032026_173518.JPEG') ?>">
+
+    <!-- JSON-LD Structured Data (Person) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "<?= addslashes($hero['name'] ?? 'Alfred Kaliisa') ?>",
+      "url": "<?= $canonical_url ?>",
+      "image": "<?= addslashes($hero['photo'] ?? '') ?>",
+      "jobTitle": "<?= addslashes($hero['title'] ?? 'Full-Stack Developer & Digital Creative') ?>",
+      "description": "<?= addslashes($settings['meta_description'] ?? '') ?>",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "<?= addslashes($contact['location'] ?? 'Kampala') ?>",
+        "addressCountry": "UG"
+      },
+      "email": "<?= addslashes($contact['email'] ?? '') ?>",
+      "telephone": "<?= addslashes($contact['phone'] ?? '') ?>",
+      "sameAs": [
+        "<?= addslashes($hero['github']    ?? '') ?>",
+        "<?= addslashes($hero['linkedin']  ?? '') ?>",
+        "<?= addslashes($hero['twitter']   ?? '') ?>",
+        "<?= addslashes($hero['instagram'] ?? '') ?>"
+      ]
+    }
+    </script>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -361,10 +419,10 @@ $cat_colors = [
 
     <!-- ========= NAVIGATION ========= -->
     <nav id="navbar" class="fixed w-full z-50 bg-navy-900/90 backdrop-blur-md border-b border-white/10 transition-all">
-        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="max-w-6xl mx-auto px-4 md:px-6 py-3 flex justify-between items-center">
             <a href="#home" class="flex items-center">
                 <img src="<?= htmlspecialchars($hero['logo'] ?? '/assets/img/LogoWiz_02032026_173518.JPEG') ?>"
-                    style="height:80px;" alt="<?= htmlspecialchars($hero['name']) ?> Logo"
+                    style="height:52px;" alt="<?= htmlspecialchars($hero['name']) ?> Logo"
                     class="w-auto hover:scale-110 transition-transform duration-300">
             </a>
             <div class="hidden md:flex space-x-8 text-sm font-semibold uppercase tracking-widest text-slate-400">
@@ -399,15 +457,15 @@ $cat_colors = [
 
     <!-- ========= HERO SECTION ========= -->
     <section id="home" class="min-h-screen flex items-center justify-center pt-20 relative overflow-hidden">
-        <div class="absolute top-20 right-0 w-96 h-96 bg-green-500/10 rounded-full blur-3xl -z-10 float-animation"></div>
-        <div class="absolute bottom-0 left-0 w-72 h-72 bg-gold-500/10 rounded-full blur-3xl -z-10 float-animation" style="animation-delay:3s"></div>
+        <div class="absolute top-20 right-0 w-64 md:w-96 h-64 md:h-96 bg-green-500/10 rounded-full blur-3xl -z-10 float-animation"></div>
+        <div class="absolute bottom-0 left-0 w-48 md:w-72 h-48 md:h-72 bg-gold-500/10 rounded-full blur-3xl -z-10 float-animation" style="animation-delay:3s"></div>
 
-        <div class="max-w-5xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+        <div class="max-w-5xl mx-auto px-6 grid md:grid-cols-2 gap-8 md:gap-12 items-center w-full">
             <div class="order-2 md:order-1 animate-fade-in">
                 <h2 class="text-green-500 font-bold tracking-widest uppercase mb-2 text-sm slide-in-left">
                     <?= htmlspecialchars($hero['greeting'] ?? 'Hello, I am') ?>
                 </h2>
-                <h1 class="text-5xl md:text-6xl font-serif font-bold text-white mb-2 leading-tight">
+                <h1 class="text-4xl sm:text-5xl md:text-6xl font-serif font-bold text-white mb-2 leading-tight">
                     <?php
                     $name_parts = explode(' ', $hero['name'] ?? 'Alfred Kaliisa', 2);
                     echo htmlspecialchars($name_parts[0]);
@@ -415,32 +473,32 @@ $cat_colors = [
                         <span class="text-gradient"> <?= htmlspecialchars($name_parts[1]) ?></span>
                     <?php endif; ?>
                 </h1>
-                <p class="text-xl md:text-2xl text-slate-400 mb-6 font-light animate-fade-in delay-200">
+                <p class="text-lg sm:text-xl md:text-2xl text-slate-400 mb-6 font-light animate-fade-in delay-200">
                     <?= htmlspecialchars($hero['title'] ?? 'Full-Stack Developer & Digital Creative') ?>
                 </p>
-                <div class="flex flex-wrap gap-4">
+                <div class="flex flex-wrap gap-3 md:gap-4">
                     <a href="<?= htmlspecialchars($hero['hire_me_link'] ?? '#contact') ?>"
-                        class="px-8 py-3 bg-gradient-to-r from-green-500 to-gold-500 text-white font-bold rounded hover:shadow-lg hover:shadow-green-500/50 transition-all transform hover:-translate-y-1">
+                        class="px-6 md:px-8 py-3 bg-gradient-to-r from-green-500 to-gold-500 text-white font-bold rounded hover:shadow-lg hover:shadow-green-500/50 transition-all transform hover:-translate-y-1">
                         Hire Me
                     </a>
                     <a href="<?= htmlspecialchars($hero['portfolio_link'] ?? '#portfolio') ?>"
-                        class="px-8 py-3 border-2 border-green-500 text-slate-300 font-bold rounded hover:bg-green-500 hover:text-white transition-all">
+                        class="px-6 md:px-8 py-3 border-2 border-green-500 text-slate-300 font-bold rounded hover:bg-green-500 hover:text-white transition-all">
                         View Portfolio
                     </a>
                 </div>
-                <div class="mt-10 flex gap-6 text-slate-500">
-                    <a href="<?= htmlspecialchars($hero['github'] ?? '#') ?>" class="hover:text-green-500 text-2xl transition-all hover:scale-125"><i class="fab fa-github"></i></a>
-                    <a href="<?= htmlspecialchars($hero['linkedin'] ?? '#') ?>" class="hover:text-green-500 text-2xl transition-all hover:scale-125"><i class="fab fa-linkedin"></i></a>
-                    <a href="<?= htmlspecialchars($hero['twitter'] ?? '#') ?>" class="hover:text-green-500 text-2xl transition-all hover:scale-125"><i class="fab fa-twitter"></i></a>
-                    <a href="<?= htmlspecialchars($hero['instagram'] ?? '#') ?>" class="hover:text-green-500 text-2xl transition-all hover:scale-125"><i class="fab fa-instagram"></i></a>
+                <div class="mt-8 md:mt-10 flex gap-6 text-slate-500">
+                    <a href="<?= htmlspecialchars($hero['github'] ?? '#') ?>" aria-label="GitHub" class="hover:text-green-500 text-2xl transition-all hover:scale-125"><i class="fab fa-github"></i></a>
+                    <a href="<?= htmlspecialchars($hero['linkedin'] ?? '#') ?>" aria-label="LinkedIn" class="hover:text-green-500 text-2xl transition-all hover:scale-125"><i class="fab fa-linkedin"></i></a>
+                    <a href="<?= htmlspecialchars($hero['twitter'] ?? '#') ?>" aria-label="Twitter" class="hover:text-green-500 text-2xl transition-all hover:scale-125"><i class="fab fa-twitter"></i></a>
+                    <a href="<?= htmlspecialchars($hero['instagram'] ?? '#') ?>" aria-label="Instagram" class="hover:text-green-500 text-2xl transition-all hover:scale-125"><i class="fab fa-instagram"></i></a>
                 </div>
             </div>
             <div class="order-1 md:order-2 flex justify-center animate-fade-in delay-200">
-                <div class="relative">
-                    <div class="absolute inset-0 border-4 border-green-500 rounded-lg transform translate-x-6 translate-y-6"></div>
+                <div class="relative mx-4">
+                    <div class="absolute inset-0 border-4 border-green-500 rounded-lg transform translate-x-4 translate-y-4 md:translate-x-6 md:translate-y-6"></div>
                     <img src="<?= htmlspecialchars($hero['photo'] ?? '/assets/img/IMG_20260304_010335_441.webp') ?>"
-                        alt="<?= htmlspecialchars($hero['name'] ?? 'Alfred Kaliisa') ?>"
-                        class="w-72 h-72 md:w-96 md:h-96 object-cover rounded-lg border-4 border-gold-500 shadow-2xl relative z-10 hover:shadow-green-500/50 transition-all duration-700 glow-on-hover">
+                        alt="<?= htmlspecialchars($hero['name'] ?? 'Alfred Kaliisa') ?> - Portfolio Photo"
+                        class="w-52 h-52 sm:w-64 sm:h-64 md:w-96 md:h-96 object-cover rounded-lg border-4 border-gold-500 shadow-2xl relative z-10 hover:shadow-green-500/50 transition-all duration-700 glow-on-hover">
                 </div>
             </div>
         </div>
@@ -528,24 +586,20 @@ $cat_colors = [
                 <h2 class="text-3xl md:text-4xl font-serif font-bold text-white mb-4">Professional Journey</h2>
                 <div class="w-20 h-1 bg-gradient-to-r from-green-500 to-gold-500 mx-auto"></div>
             </div>
-            <div class="space-y-12 border-l-2 border-green-500/30 ml-3 md:ml-0 pl-8 md:pl-0">
+            <div class="space-y-10 pl-6 border-l-2 border-green-500/30">
                 <?php foreach (($experience ?? []) as $exp): ?>
-                    <div class="relative md:grid md:grid-cols-5 md:gap-8 items-start">
-                        <div class="hidden md:block md:col-span-1 text-right pt-2">
-                            <span class="text-green-500 font-bold"><?= htmlspecialchars($exp['period']) ?></span>
-                        </div>
-                        <div class="absolute -left-[39px] md:left-auto md:relative md:col-span-4 md:ml-8">
-                            <div class="absolute -left-[45px] top-2 w-5 h-5 rounded-full bg-green-500 border-4 border-gold-500 md:-left-[43px] animate-pulse"></div>
-                            <div class="bg-navy-900 p-6 rounded-lg border border-white/5 shadow-lg hover:shadow-green-500/30 transition-all glow-on-hover">
-                                <span class="md:hidden text-green-500 text-xs font-bold uppercase mb-2 block"><?= htmlspecialchars($exp['period']) ?></span>
-                                <h3 class="text-xl font-bold text-white"><?= htmlspecialchars($exp['title']) ?></h3>
-                                <p class="text-slate-400 text-sm mb-4"><?= htmlspecialchars($exp['company']) ?></p>
-                                <ul class="text-slate-300 text-sm space-y-2 list-disc list-inside marker:text-green-500">
-                                    <?php foreach (($exp['bullets'] ?? []) as $bullet): ?>
-                                        <li><?= htmlspecialchars($bullet) ?></li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
+                    <div class="relative">
+                        <!-- Timeline dot -->
+                        <div class="absolute -left-[31px] top-3 w-4 h-4 rounded-full bg-green-500 border-4 border-gold-500 animate-pulse"></div>
+                        <div class="bg-navy-900 p-5 md:p-6 rounded-lg border border-white/5 shadow-lg hover:shadow-green-500/30 transition-all glow-on-hover">
+                            <span class="text-green-500 text-xs font-bold uppercase mb-1 block"><?= htmlspecialchars($exp['period']) ?></span>
+                            <h3 class="text-lg md:text-xl font-bold text-white"><?= htmlspecialchars($exp['title']) ?></h3>
+                            <p class="text-slate-400 text-sm mb-4"><?= htmlspecialchars($exp['company']) ?></p>
+                            <ul class="text-slate-300 text-sm space-y-2 list-disc list-inside marker:text-green-500">
+                                <?php foreach (($exp['bullets'] ?? []) as $bullet): ?>
+                                    <li><?= htmlspecialchars($bullet) ?></li>
+                                <?php endforeach; ?>
+                            </ul>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -634,13 +688,16 @@ $cat_colors = [
     <!-- ========= EDUCATION SECTION ========= -->
     <section id="education" class="py-20 bg-navy-800">
         <div class="max-w-4xl mx-auto px-6">
-            <h2 class="text-2xl font-bold text-white mb-8 border-l-4 border-green-500 pl-4">Education</h2>
-            <div class="grid md:grid-cols-2 gap-6">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl md:text-4xl font-serif font-bold text-white mb-4">Education</h2>
+                <div class="w-20 h-1 bg-gradient-to-r from-green-500 to-gold-500 mx-auto"></div>
+            </div>
+            <div class="grid sm:grid-cols-2 gap-6">
                 <?php foreach (($education ?? []) as $edu): ?>
                     <div class="bg-navy-900 p-6 rounded border border-white/5 hover:border-green-500/50 transition-all glow-on-hover">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-bold text-white text-lg"><?= htmlspecialchars($edu['degree']) ?></h4>
-                            <span class="text-green-500 text-sm bg-green-500/10 px-2 py-1 rounded whitespace-nowrap ml-2"><?= htmlspecialchars($edu['period']) ?></span>
+                        <div class="flex flex-col gap-2 mb-2">
+                            <span class="text-green-500 text-xs font-bold bg-green-500/10 px-2 py-1 rounded self-start"><?= htmlspecialchars($edu['period']) ?></span>
+                            <h4 class="font-bold text-white text-base md:text-lg leading-snug"><?= htmlspecialchars($edu['degree']) ?></h4>
                         </div>
                         <p class="text-slate-400 text-sm"><?= htmlspecialchars($edu['institution']) ?></p>
                     </div>
@@ -656,7 +713,7 @@ $cat_colors = [
             <p class="text-slate-400 mb-12 max-w-lg mx-auto">
                 Ready to start your next project with a professional who understands both code and design?
             </p>
-            <div class="grid md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-8">
                 <a href="<?= htmlspecialchars($contact['phone_link'] ?? '#') ?>"
                     class="group p-8 bg-navy-900 rounded-lg hover:bg-gradient-to-br hover:from-green-500 hover:to-gold-500 transition-all glow-on-hover">
                     <i class="fas fa-phone text-3xl text-green-500 group-hover:text-white mb-4 transition-colors block"></i>
