@@ -2,12 +2,7 @@
 // =============================================
 // Database Configuration — MySQL
 // =============================================
-// define('DB_HOST',    'sql313.infinityfree.com'); 
-// define('DB_NAME',    'if0_41440545_alfred'); 
-// define('DB_USER',    'if0_41440545');         
-// define('DB_PASS',    'YSW6pHennPea0E');       
-// define('DB_CHARSET', 'utf8mb4');
-// define('DB_PORT',    3306);
+
 // define('DB_HOST',    'mysql'); // Docker service hostname
 define('DB_HOST',    'localhost');
 define('DB_NAME',    'alfred'); 
